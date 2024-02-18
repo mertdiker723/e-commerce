@@ -1,31 +1,32 @@
 "use client"
-
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 // Styles
 import "./Style.scss";
 
 const Navbar = () => {
-    const [isSticky, setIsSticky] = useState(false);
+    const navRef = useRef<HTMLElement>(null);
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY;
+            const { classList } = navRef.current ?? {};
             if (scrollTop > 70) {
-                setIsSticky(true);
-                return;
+                classList?.add("sticky");
+            } else {
+                classList?.remove("sticky");
             }
-            setIsSticky(false);
         };
 
         window.addEventListener('scroll', handleScroll);
 
         return () => {
+
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
 
     return (
-        <nav className={`navbar-container ${isSticky ? ' sticky' : ''}`}>Navbar</nav>
+        <nav ref={navRef} className="navbar-container">Navbar</nav>
     )
 }
 
