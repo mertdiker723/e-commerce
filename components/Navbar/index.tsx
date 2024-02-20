@@ -24,7 +24,6 @@ const Navbar = () => {
         window.addEventListener('scroll', handleScroll);
 
         return () => {
-
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
@@ -39,14 +38,16 @@ const Navbar = () => {
                     alt="picture"
                 />
             </div>
-            <div className="contents">
+            <div className="contents-web">
                 <div className="link-container">
                     <div className="link"><Link href="/">Home</Link></div>
-                    <div className="link"><Link href="/about">About</Link></div>
+                    <div className="link"><Link href="/brand">Brand</Link></div>
                     <div className="link"><Link href="/category">Category</Link></div>
                     <div className="link"><Link href="/product">Product</Link></div>
                     <div className="link"><Link href="/login">Login</Link></div>
                 </div>
+            </div>
+            <div className="contents-mobile">
                 <Image
                     src={Hamburger}
                     width={30}
@@ -54,7 +55,6 @@ const Navbar = () => {
                     alt="picture"
                     className="hamburger-menu"
                 />
-
             </div>
         </nav>
     )

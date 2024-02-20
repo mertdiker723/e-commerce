@@ -1,0 +1,13 @@
+.product-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 15px;
+    border-radius: 5px;
+    background-color: #eeeeee;
+    padding: 20px;
+
+    .btn-product {
+      width: 150px;
+    }
+
+}
