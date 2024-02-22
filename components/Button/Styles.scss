@@ -1,0 +1,20 @@
+.button-item {
+    border-radius: 4px;
+    border: none;
+    color: #ffffff;
+    text-align: center;
+    font-size: 20px;
+    padding: 5px;
+    width: 100%;
+    cursor: pointer;
+
+    &.bg-color-red {
+        background-color: red;
+    }
+    &.bg-color-blue {
+        background-color: blue;
+    }
+    &.bg-color-open-red {
+        background-color: #f4511e;
+    }
+}

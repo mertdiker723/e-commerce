@@ -1,0 +1,12 @@
+.category-container {
+  display: grid;
+  grid-template-columns: auto;
+  gap: 15px;
+  border-radius: 5px;
+  background-color: #eeeeee;
+  padding: 20px;
+
+  .btn-category {
+    width: 150px;
+  }
+}
