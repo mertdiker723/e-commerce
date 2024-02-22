@@ -7,9 +7,11 @@ import Image from "next/image";
 import "./Style.scss";
 import Hamburger from "../../assets/icons/Hamburger/index.svg"
 import Link from "next/link";
+import DropdownLink from "../DropdownLink";
 
 const Navbar = () => {
     const navRef = useRef<HTMLElement>(null);
+
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY;
@@ -28,6 +30,21 @@ const Navbar = () => {
         };
     }, []);
 
+    const dropdownCategoryItems = [
+        { href: "/category", text: "Category", className: "" },
+        { href: "/categoryListing", text: "Category List", className: "mt-2" }
+    ];
+
+    const dropdownBrandItems = [
+        { href: "/brand", text: "Brand", className: "" },
+        { href: "/brandListing", text: "Brand List", className: "mt-2" }
+    ];
+
+    const dropdownProductItems = [
+        { href: "/product", text: "Product", className: "" },
+        { href: "/productListing", text: "Product List", className: "mt-2" }
+    ];
+
     return (
         <nav ref={navRef} className="navbar-container">
             <div>
@@ -41,9 +58,24 @@ const Navbar = () => {
             <div className="contents-web">
                 <div className="link-container">
                     <div className="link"><Link href="/">Home</Link></div>
-                    <div className="link"><Link href="/brand">Brand</Link></div>
-                    <div className="link"><Link href="/category">Category</Link></div>
-                    <div className="link"><Link href="/product">Product</Link></div>
+                    <div className="link">
+                        <DropdownLink
+                            buttonText="Brand"
+                            dropdownItems={dropdownBrandItems}
+                        />
+                    </div>
+                    <div className="link">
+                        <DropdownLink
+                            buttonText="Category"
+                            dropdownItems={dropdownCategoryItems}
+                        />
+                    </div>
+                    <div className="link">
+                        <DropdownLink
+                            buttonText="Product"
+                            dropdownItems={dropdownProductItems}
+                        />
+                    </div>
                     <div className="link"><Link href="/login">Login</Link></div>
                 </div>
             </div>

@@ -1,11 +1,11 @@
+import { HTMLInputTypeAttribute } from "react";
 
 // Styles
-import { HTMLInputTypeAttribute } from "react";
 import "./Styles.scss"
 
 type InputTypes = {
     label: string;
-    type: HTMLInputTypeAttribute | undefined;
+    type?: HTMLInputTypeAttribute | undefined;
     name?: string;
     maxLength?: number;
     customClassName?: string;
@@ -14,7 +14,7 @@ type InputTypes = {
     onChange?: () => void;
 }
 
-const Input = ({ label, type, maxLength = 20, customClassName, inputClassName, placeHolder, onChange, name }: InputTypes) => {
+const Input = ({ label, type, maxLength = 20, customClassName, inputClassName, placeHolder, name, onChange }: InputTypes) => {
     return (
         <label className={customClassName}>
             <span>{label}</span>
