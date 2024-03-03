@@ -14,7 +14,13 @@
     &.bg-color-blue {
         background-color: blue;
     }
+    &.bg-color-green {
+        background-color: green;
+    }
     &.bg-color-open-red {
         background-color: #f4511e;
     }
+    &.width-fix {
+        width: 100px;
+    } 
 }
