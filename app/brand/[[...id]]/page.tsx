@@ -23,9 +23,13 @@ const Brand = () => {
 
   useEffect(() => {
     const id = params?.id?.[0];
-    if (id) {
-      let brandsArray: BrandType[] = JSON.parse(localStorage.getItem("brands") || "[]");
-      setData(brandsArray.find(item => item.id === id) as BrandType)
+    if (!id) return;
+
+    const brandsArray: BrandType[] = JSON.parse(localStorage.getItem("brands") || "[]");
+
+    const findedBrand = brandsArray.find(item => item.id === id);
+    if (findedBrand) {
+      setData(findedBrand);
     }
 
   }, [params?.id]);
@@ -50,7 +54,7 @@ const Brand = () => {
         setData({ ...data, brand: value });
 
         router.push("/brandListing")
-        
+
       } else {
         const brandObject = { id: uniqid(), brand: value };
         brandsArray.push(brandObject);
@@ -70,7 +74,7 @@ const Brand = () => {
         maxLength={50}
         placeHolder="Brand Name"
         name="brand"
-        defaultValue={data.brand || ""}
+        defaultValue={data?.brand || ""}
       />
       <Button
         text={`${data.id ? "Update" : "Send"}`}
