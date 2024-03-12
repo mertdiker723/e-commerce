@@ -44,19 +44,19 @@ const Brand = () => {
       if (data.id) {
         const updatedBrandsArray = brandsArray.map(brand => {
           if (brand.id === data.id) {
-            return { ...brand, brand: value };
+            return { ...brand, name: value };
           }
           return brand;
         });
 
         const updatedBrandsArrayString = JSON.stringify(updatedBrandsArray);
         localStorage.setItem("brands", updatedBrandsArrayString);
-        setData({ ...data, brand: value });
+        setData({ ...data, name: value });
 
         router.push("/brandListing")
 
       } else {
-        const brandObject = { id: uniqid(), brand: value };
+        const brandObject = { id: uniqid(), name: value };
         brandsArray.push(brandObject);
         const updatedBrandsArrayString = JSON.stringify(brandsArray);
         localStorage.setItem("brands", updatedBrandsArrayString);
@@ -74,7 +74,7 @@ const Brand = () => {
         maxLength={50}
         placeHolder="Brand Name"
         name="brand"
-        defaultValue={data?.brand || ""}
+        defaultValue={data?.name || ""}
       />
       <Button
         text={`${data.id ? "Update" : "Send"}`}

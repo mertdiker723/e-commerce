@@ -1,6 +1,6 @@
 type BrandType = {
     id: string;
-    brand: string;
+    name: string;
 }
 
 

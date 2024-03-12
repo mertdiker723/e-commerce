@@ -44,19 +44,19 @@ const Category = () => {
             if (data.id) {
                 const updatedCategoriesArray = categoriesArray.map(category => {
                     if (category.id === data.id) {
-                        return { ...category, category: value };
+                        return { ...category, name: value };
                     }
                     return category;
                 });
 
                 const updatedCategoriesArrayString = JSON.stringify(updatedCategoriesArray);
                 localStorage.setItem("categories", updatedCategoriesArrayString);
-                setData({ ...data, category: value });
+                setData({ ...data, name: value });
 
                 router.push("/categoryListing")
 
             } else {
-                const categoryObject = { id: uniqid(), category: value };
+                const categoryObject = { id: uniqid(), name: value };
                 categoriesArray.push(categoryObject);
                 const updatedCategoriesArrayString = JSON.stringify(categoriesArray);
                 localStorage.setItem("categories", updatedCategoriesArrayString);
@@ -74,11 +74,11 @@ const Category = () => {
                 maxLength={50}
                 placeHolder="Category Name"
                 name="category"
-                defaultValue={data.category || ""}
+                defaultValue={data.name || ""}
             />
             <Button
-                text="Send"
-                customClassName="btn-category bg-color-open-red"
+                text={`${data.id ? "Update" : "Send"}`}
+                customClassName={`btn-category ${data.id ? "bg-color-green" : "bg-color-open-red"}`}
                 type="submit"
             />
         </form>
