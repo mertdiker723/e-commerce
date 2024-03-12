@@ -42,11 +42,11 @@ const CategoryListing = () => {
                 <tbody>
                     {
                         data.map((item) => {
-                            const { id, category } = item || {};
+                            const { id, name } = item || {};
                             return (
                                 <tr key={id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     <td className="px-6 py-4">{id}</td>
-                                    <td className="px-6 py-4">{category}</td>
+                                    <td className="px-6 py-4">{name}</td>
                                     <td className="px-6 py-4 flex justify-end">
                                         <Button type="button" text="Delete" onClick={() => deleteCategory(id)} customClassName="bg-color-open-red width-fix mr-3" />
                                         <Button type="button" text="Edit"  onClick={() => router.push(`/category/${id}`)} customClassName="bg-color-green width-fix" />

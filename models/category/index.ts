@@ -1,6 +1,6 @@
 type CategoryType = {
     id: string;
-    category: string;
+    name: string;
 }
 
 
