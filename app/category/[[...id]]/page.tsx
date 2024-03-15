@@ -60,9 +60,8 @@ const Category = () => {
                 categoriesArray.push(categoryObject);
                 const updatedCategoriesArrayString = JSON.stringify(categoriesArray);
                 localStorage.setItem("categories", updatedCategoriesArrayString);
+                e.currentTarget.reset();
             }
-
-            e.currentTarget.reset();
         }
     };
 
