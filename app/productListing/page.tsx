@@ -53,8 +53,8 @@ const ProductListing = () => {
                   <td className="px-6 py-4">{productName || '-'}</td>
                   <td className="px-6 py-4">{productDetail || '-'}</td>
                   <td className="px-6 py-4">{price || '-'}</td>
-                  <td className="px-6 py-4">{brand?.name || '-'}</td>
                   <td className="px-6 py-4">{category?.name || '-'}</td>
+                  <td className="px-6 py-4">{brand?.name || '-'}</td>
                   <td className="px-6 py-4 flex justify-end">
                     <Button type="button" text="Delete" onClick={() => deleteProduct(id)} customClassName="bg-color-open-red width-fix mr-3" />
                     <Button type="button" text="Edit" onClick={() => router.push(`/product/${id}`)} customClassName="bg-color-green width-fix" />

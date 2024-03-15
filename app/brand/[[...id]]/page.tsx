@@ -60,9 +60,8 @@ const Brand = () => {
         brandsArray.push(brandObject);
         const updatedBrandsArrayString = JSON.stringify(brandsArray);
         localStorage.setItem("brands", updatedBrandsArrayString);
+        e.currentTarget.reset();
       }
-
-      e.currentTarget.reset();
     }
   };
 

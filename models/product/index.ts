@@ -5,6 +5,7 @@ type ProductType = {
     id: string;
     productName: string;
     productDetail: string;
+    date: string;
     price: number;
     category: CategoryType | null;
     brand: BrandType | null;
