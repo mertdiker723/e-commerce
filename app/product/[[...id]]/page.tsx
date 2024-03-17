@@ -5,9 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import uniqid from 'uniqid';
 
 // Components
-import Button from "@/components/Button";
-import Input from "@/components/Input";
-import Select from "@/components/Select";
+import Button from "@/common/Button";
+import Input from "@/common/Input";
+import Select from "@/common/Select";
 
 // Models
 import ProductType from "@/models/product";
@@ -99,17 +99,7 @@ const Product = () => {
 
                 const updatedProductsArrayString = JSON.stringify(updatedProductsArray);
                 localStorage.setItem("products", updatedProductsArrayString);
-                setState({
-                    data: {
-                        ...data,
-                        productName,
-                        productDetail,
-                        date,
-                        price: +price,
-                        brand: brand ?? null,
-                        category: category ?? null
-                    }
-                });
+
                 router.push("/productListing");
             } else {
                 const productObject = {

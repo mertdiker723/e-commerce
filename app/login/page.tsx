@@ -1,6 +1,14 @@
+import LoginFrame from '../../components/LoginFrame';
+
+import "./Style.scss";
+
 const Login = () => {
     return (
-        <div>Login</div>
+
+        <div className="login-container">
+            <LoginFrame />
+        </div>
+
     )
 }
 

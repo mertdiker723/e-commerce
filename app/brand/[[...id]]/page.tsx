@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import uniqid from 'uniqid';
 
 // Components
-import Button from "@/components/Button"
-import Input from "@/components/Input"
+import Button from "@/common/Button"
+import Input from "@/common/Input"
 
 // Models
 import BrandType from '@/models/brand';
