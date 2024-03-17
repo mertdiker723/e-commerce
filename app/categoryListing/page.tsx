@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Components
-import Button from "@/components/Button";
+import Button from "@/common/Button";
 
 // Models
 import CategoryType from "@/models/category";

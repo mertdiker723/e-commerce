@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useRef } from "react";
-
+import { usePathname } from 'next/navigation'
 // Next
 import Image from "next/image";
 // Styles
@@ -11,6 +11,10 @@ import DropdownLink from "../DropdownLink";
 
 const Navbar = () => {
     const navRef = useRef<HTMLElement>(null);
+    const params = usePathname();
+    // eslint-disable-next-line no-console
+    console.log(params.split("/")[1]);
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -44,6 +48,8 @@ const Navbar = () => {
         { href: "/product", text: "Product", className: "" },
         { href: "/productListing", text: "Product List", className: "mt-2" }
     ];
+
+    if (params.split("/").length > 0 && params.split("/")[1] === 'login') return;
 
     return (
         <nav ref={navRef} className="navbar-container">
