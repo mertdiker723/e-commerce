@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useReducer } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import uniqid from 'uniqid';
 
 // Components
@@ -24,7 +24,7 @@ type ProductStateType = {
     data: ProductType;
 }
 
-const Product = () => {
+const Product = ({ params }: { params: { id: string[] } }) => {
     const [state, setState] = useReducer((currentState: ProductStateType, newState: Partial<ProductStateType>) => ({ ...currentState, ...newState }), {
         brands: [],
         categories: [],
@@ -32,9 +32,7 @@ const Product = () => {
     });
     const { brands, categories, data } = state;
 
-    const params = useParams() as { id: string[] };
     const router = useRouter();
-
 
     useEffect(() => {
         const id = params?.id?.[0];
