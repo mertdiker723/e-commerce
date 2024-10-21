@@ -21,6 +21,7 @@ import "./Styles.scss";
 type ProductStateType = {
     brands: BrandType[];
     categories: CategoryType[];
+    selects: any[];
     data: ProductType;
 }
 
@@ -28,24 +29,28 @@ const Product = ({ params }: { params: { id: string[] } }) => {
     const [state, setState] = useReducer((currentState: ProductStateType, newState: Partial<ProductStateType>) => ({ ...currentState, ...newState }), {
         brands: [],
         categories: [],
+        selects: [],
         data: {} as ProductType
     });
-    const { brands, categories, data } = state;
+    const { brands, categories, selects, data } = state;
 
     const router = useRouter();
 
     useEffect(() => {
         const id = params?.id?.[0];
         if (!id) return;
+        if (localStorage.getItem("products")) {
 
-        const productsArray: ProductType[] = JSON.parse(localStorage.getItem("products") || "[]");
+            const productsArray: ProductType[] = JSON.parse(localStorage.getItem("products") || "[]");
 
-        const findedProduct = productsArray.find(item => item.id === id);
-        if (findedProduct) {
-            setState({
-                data: findedProduct
-            });
-        }
+            const findedProduct = productsArray.find(item => item.id === id);
+            if (findedProduct) {
+                setState({
+                    data: findedProduct
+                });
+            }
+        } localStorage.getItem("products")
+
 
     }, [params?.id]);
 
@@ -56,10 +61,22 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         { label: "Date:", type: "date", name: "date", defaultValue: data.date }
     ];
 
-    const selects = [
-        { label: "Category", data: categories, name: "category", defaultValue: data.category?.id },
-        { label: "Brand", data: brands, name: "brand", defaultValue: data.brand?.id }
-    ];
+    useEffect(() => {
+        const categoriesFromLocalStorage = JSON.parse(localStorage.getItem("categories") || '[]') as CategoryType[];
+        const brandsFromLocalStorage = JSON.parse(localStorage.getItem("brands") || '[]') as BrandType[];
+
+        const categoryDefaultValue = categoriesFromLocalStorage.find(item => item?.id === data.category?.id);
+        const brandDefaultValue = brandsFromLocalStorage.find(item => item?.id === data.brand?.id);
+
+
+        setState({
+            selects: [
+                { label: "Category", data: categories, name: "category", defaultValue: categoryDefaultValue },
+                { label: "Brand", data: brands, name: "brand", defaultValue: brandDefaultValue }
+            ]
+        });
+
+    }, [data.category?.id, data.brand?.id, categories, brands]);
 
     useEffect(() => {
         const brandItems: BrandType[] = JSON.parse(localStorage.getItem("brands") || "[]");
