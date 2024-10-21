@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
 import uniqid from 'uniqid';
+import axios from 'axios';
 
 // Components
 import Button from "@/common/Button"
@@ -20,6 +21,13 @@ const Brand = () => {
 
   const params = useParams() as { id: string[] };
   const router = useRouter();
+
+  useEffect(() => {
+    axios.get('/api/users/7')
+      .then(function (response) {
+      })
+  }, [])
+
 
   useEffect(() => {
     const id = params?.id?.[0];

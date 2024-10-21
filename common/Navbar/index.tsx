@@ -12,9 +12,6 @@ import DropdownLink from "../DropdownLink";
 const Navbar = () => {
     const navRef = useRef<HTMLElement>(null);
     const params = usePathname();
-    // eslint-disable-next-line no-console
-    console.log(params.split("/")[1]);
-
 
     useEffect(() => {
         const handleScroll = () => {
