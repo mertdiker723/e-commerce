@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import Image from "next/image";
 // Styles
 import "./Style.scss";
-import Hamburger from "../../assets/icons/Hamburger/index.svg"
 import Link from "next/link";
 import DropdownLink from "../DropdownLink";
 
@@ -84,7 +83,7 @@ const Navbar = () => {
             </div>
             <div className="contents-mobile">
                 <Image
-                    src={Hamburger}
+                    src="/assets/icons/Hamburger/index.svg"
                     width={30}
                     height={30}
                     alt="picture"
