@@ -1,16 +1,30 @@
 "use client"
-import { useEffect, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { usePathname } from 'next/navigation'
+import { useSelector } from "react-redux";
+import Link from "next/link";
+
 // Next
 import Image from "next/image";
-// Styles
-import "./Style.scss";
-import Link from "next/link";
+
+// Components
 import DropdownLink from "../DropdownLink";
 
+// Models
+import ProductType from "@/models/product";
+// Styles
+import "./Style.scss";
+
+type RootState = {
+    cartReducer: {
+        cart: (ProductType & { count: number })[];
+    };
+};
 const Navbar = () => {
     const navRef = useRef<HTMLElement>(null);
     const params = usePathname();
+    const { cart } = useSelector((state: RootState) => state.cartReducer);
+    const totalItems = cart.reduce((total, item) => total + item.count, 0);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -45,7 +59,7 @@ const Navbar = () => {
         { href: "/productListing", text: "Product List", className: "mt-2" }
     ];
 
-    if (params.split("/").length > 0 && params.split("/")[1] === 'login') return;
+    if (params && params.split("/").length > 0 && params.split("/")[1] === 'login') return;
 
     return (
         <nav ref={navRef} className="navbar-container">
@@ -77,6 +91,18 @@ const Navbar = () => {
                             buttonText="Product"
                             dropdownItems={dropdownProductItems}
                         />
+                    </div>
+                    <div className="link">
+                        <Link href="/cart">
+                            <div className="flex">
+                                <Image
+                                    src="/assets/images/cart/cart-icon.svg"
+                                    width={20}
+                                    height={20}
+                                    alt="picture"
+                                />
+                                ({totalItems > 0 ? <span>{totalItems}</span> : 0})</div>
+                        </Link>
                     </div>
                     <div className="link"><Link href="/login">Login</Link></div>
                 </div>

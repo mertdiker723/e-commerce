@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
-import uniqid from 'uniqid';
 import axios from 'axios';
 
 // Components
@@ -17,78 +16,77 @@ import BrandType from '@/models/brand';
 import "./Styles.scss"
 
 const Brand = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [data, setData] = useState<BrandType>({} as BrandType);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const params = useParams() as { id: string[] };
   const router = useRouter();
 
   useEffect(() => {
-    axios.get('/api/users/7')
-      .then(function (response) {
-      })
-  }, [])
+    const fetchBrand = async () => {
+      const id = params?.id?.[0];
+      if (!id) return
+      try {
+        const response = await axios.get(`/api/brand?id=${id}`);
+        const { data } = response || {};
+        setData(data);
+      } catch (error: any) {
+        setErrorMessage(error.message);
+      }
+    };
 
-
-  useEffect(() => {
-    const id = params?.id?.[0];
-    if (!id) return;
-
-    const brandsArray: BrandType[] = JSON.parse(localStorage.getItem("brands") || "[]");
-
-    const findedBrand = brandsArray.find(item => item.id === id);
-    if (findedBrand) {
-      setData(findedBrand);
-    }
-
+    fetchBrand();
   }, [params?.id]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let formData = new FormData(e.currentTarget);
+    const formData = new FormData(e.currentTarget);
     const value = formData.get("brand") as string;
-    if (value.trim()) {
-      let brandsArray: BrandType[] = JSON.parse(localStorage.getItem("brands") || "[]");
 
-      if (data.id) {
-        const updatedBrandsArray = brandsArray.map(brand => {
-          if (brand.id === data.id) {
-            return { ...brand, name: value };
-          }
-          return brand;
-        });
+    if (!value.trim()) return;
 
-        const updatedBrandsArrayString = JSON.stringify(updatedBrandsArray);
-        localStorage.setItem("brands", updatedBrandsArrayString);
-        setData({ ...data, name: value });
+    setIsLoading(true);
+    try {
+      const response = data?._id
+        ? await axios.put(`/api/brand?id=${data._id}`, { name: value })
+        : await axios.post('/api/brand', { name: value });
 
-        router.push("/brandListing")
-
-      } else {
-        const brandObject = { id: uniqid(), name: value };
-        brandsArray.push(brandObject);
-        const updatedBrandsArrayString = JSON.stringify(brandsArray);
-        localStorage.setItem("brands", updatedBrandsArrayString);
-        e.currentTarget.reset();
+      const { status } = response || {};
+      if ((data?._id && status === 200) || (!data?._id && status === 201)) {
+        router.push("/brandListing");
       }
+    } catch (error: any) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
+  }
   return (
-    <form onSubmit={handleSubmit} className="container mx-auto mt-8 brand-container">
-      <Input
-        label="Brand Name:"
-        type="text"
-        maxLength={50}
-        placeHolder="Brand Name"
-        name="brand"
-        defaultValue={data?.name || ""}
-      />
-      <Button
-        text={`${data.id ? "Update" : "Send"}`}
-        customClassName={`btn-brand ${data.id ? "bg-color-green" : "bg-color-open-red"}`}
-        type="submit"
-      />
-    </form>
+    <>
+      <form onSubmit={handleSubmit} className="container mx-auto mt-8 brand-container">
+        <Input
+          label="Brand Name:"
+          type="text"
+          maxLength={50}
+          placeHolder="Brand Name"
+          name="brand"
+          defaultValue={data?.name || ""}
+          required
+        />
+        <Button
+          text={`${data._id ? "Update" : "Send"}`}
+          customClassName={`btn-brand ${data._id ? "bg-color-green" : "bg-color-open-red"}`}
+          type="submit"
+          loading={isLoading}
+        />
+      </form>
+      {errorMessage && (
+        <div className="flex justify-center mt-4">
+          <p className="text-red-500">{errorMessage}</p>
+        </div>
+      )}
+    </>
   )
 }
 

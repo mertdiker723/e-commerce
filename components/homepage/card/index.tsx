@@ -1,13 +1,21 @@
-
+import { useDispatch } from "react-redux";
 import Image from "next/image";
 
+// Models
+import ProductType from "@/models/product";
 
 // Assets && Images
 import "./Style.scss";
-import ProductType from "@/models/product";
-
 
 const CardItem = ({ id, brand, category, date, price, productDetail, productName }: ProductType) => {
+    const dispatch = useDispatch();
+    const addToCart = () => {
+        dispatch({
+            type: 'CART_ONE_ADD', payload: {
+                product: { id, brand, category, date, price, productDetail, productName },
+            }
+        });
+    };
     return (
 
         <div className="cart-container">
@@ -31,7 +39,7 @@ const CardItem = ({ id, brand, category, date, price, productDetail, productName
                     Description: {productDetail}
                 </div>
                 <div className="grid gap-2 mt-2">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={addToCart}>
                         Sepete Ekle
                     </button>
                 </div>
