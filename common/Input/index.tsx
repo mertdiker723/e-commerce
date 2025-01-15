@@ -12,10 +12,11 @@ type InputTypes = {
     customClassName?: string;
     inputClassName?: string;
     placeHolder?: string;
+    required?: boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Input = ({ label, type, maxLength = 20, customClassName, inputClassName, defaultValue, placeHolder, name, onChange }: InputTypes) => {
+const Input = ({ label, type, maxLength = 20, customClassName, inputClassName, defaultValue, placeHolder, name, required, onChange }: InputTypes) => {
     return (
         <label className={customClassName}>
             <span>{label}</span>
@@ -27,6 +28,7 @@ const Input = ({ label, type, maxLength = 20, customClassName, inputClassName, d
                 maxLength={maxLength}
                 placeholder={placeHolder}
                 onChange={onChange}
+                required={required}
             />
         </label>
     )

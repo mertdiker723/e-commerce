@@ -4,6 +4,9 @@ import { Inter } from "next/font/google";
 // Components
 import Navbar from "@/common/Navbar";
 
+// Core
+import ClientProvider from "@/core/redux/provider";
+
 // Styles
 import "./globals.scss";
 
@@ -19,8 +22,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html suppressHydrationWarning lang="en">
       <body className={inter.className}>
-        <Navbar />
-        {children}
+
+        <ClientProvider>
+          <Navbar />
+          {children}
+        </ClientProvider>
       </body>
     </html>
   );
