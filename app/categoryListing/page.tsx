@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 // Components
 import Button from "@/common/Button";
@@ -15,19 +16,32 @@ import "./Style.scss";
 const CategoryListing = () => {
     const router = useRouter()
 
-    const [data, setData] = useState<CategoryType[]>([]);
+    const [categories, setCategories] = useState<CategoryType[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {
-        let categoriesArray: CategoryType[] = JSON.parse(localStorage.getItem("categories") || "[]");
-        setData(categoriesArray);
+        axios.get("/api/category")
+            .then(res => {
+                const { data } = res || {};
+                setCategories(data)
+            }).catch(err => {
+                setErrorMessage(err.message)
+            })
+
     }, [])
 
     const deleteCategory = (id: string) => {
-        const categoriesArray = data.filter(item => item.id !== id);
+        axios.delete(`/api/category?id=${id}`)
+            .then(res => {
+                const { data } = res || {};
+                const { category } = data || [];
 
-        localStorage.setItem("categories", JSON.stringify(categoriesArray));        
+                const filteredCategories = categories.filter(item => item._id !== category._id);
+                setCategories(filteredCategories);
 
-        setData(categoriesArray)
+            }).catch(err => {
+                setErrorMessage(err.message);
+            })
     }
     return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-8 container mx-auto p-0">
@@ -41,15 +55,15 @@ const CategoryListing = () => {
                 </thead>
                 <tbody>
                     {
-                        data.map((item) => {
-                            const { id, name } = item || {};
+                        categories.map((item) => {
+                            const { _id, name } = item || {};
                             return (
-                                <tr key={id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    <td className="px-6 py-4">{id}</td>
+                                <tr key={_id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                                    <td className="px-6 py-4">{_id}</td>
                                     <td className="px-6 py-4">{name}</td>
                                     <td className="px-6 py-4 flex justify-end">
-                                        <Button type="button" text="Delete" onClick={() => deleteCategory(id)} customClassName="bg-color-open-red width-fix mr-3" />
-                                        <Button type="button" text="Edit"  onClick={() => router.push(`/category/${id}`)} customClassName="bg-color-green width-fix" />
+                                        <Button type="button" text="Delete" onClick={() => deleteCategory(_id)} customClassName="bg-color-open-red width-fix mr-3" />
+                                        <Button type="button" text="Edit" onClick={() => router.push(`/category/${_id}`)} customClassName="bg-color-green width-fix" />
                                     </td>
                                 </tr>
                             )
@@ -57,6 +71,11 @@ const CategoryListing = () => {
                     }
                 </tbody>
             </table>
+            {errorMessage && (
+                <div className="flex justify-center mt-4">
+                    <p className="text-red-500">{errorMessage}</p>
+                </div>
+            )}
         </div>
     )
 }

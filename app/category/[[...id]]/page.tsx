@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
-import uniqid from 'uniqid';
+import axios from 'axios';
 
 // Components
 import Button from "@/common/Button"
@@ -16,7 +16,9 @@ import CategoryType from '@/models/category';
 import "./Styles.scss"
 
 const Category = () => {
-    const [data, setData] = useState<CategoryType>({} as CategoryType);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [category, setCategory] = useState<CategoryType>({} as CategoryType);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     const params = useParams() as { id: string[] };
     const router = useRouter();
@@ -25,12 +27,12 @@ const Category = () => {
         const id = params?.id?.[0];
         if (!id) return;
 
-        const categoriesArray: CategoryType[] = JSON.parse(localStorage.getItem("categories") || "[]");
-
-        const findedCategory = categoriesArray.find(item => item.id === id);
-        if (findedCategory) {
-            setData(findedCategory);
-        }
+        axios.get(`/api/category?id=${id}`).then(res => {
+            const { data } = res || {};
+            setCategory(data);
+        }).catch(error => {
+            setErrorMessage(error.message);
+        })
 
     }, [params?.id]);
 
@@ -38,32 +40,25 @@ const Category = () => {
         e.preventDefault();
         let formData = new FormData(e.currentTarget);
         const value = formData.get("category") as string;
+        const id = params?.id?.[0];
         if (value.trim()) {
-            let categoriesArray: CategoryType[] = JSON.parse(localStorage.getItem("categories") || "[]");
+            setIsLoading(true);
+            const apiCall = id
+                ? axios.put(`/api/category?id=${category._id}`, { name: value })
+                : axios.post("/api/category", { name: value });
 
-            if (data.id) {
-                const updatedCategoriesArray = categoriesArray.map(category => {
-                    if (category.id === data.id) {
-                        return { ...category, name: value };
-                    }
-                    return category;
-                });
-
-                const updatedCategoriesArrayString = JSON.stringify(updatedCategoriesArray);
-                localStorage.setItem("categories", updatedCategoriesArrayString);
-                setData({ ...data, name: value });
-
-                router.push("/categoryListing")
-
-            } else {
-                const categoryObject = { id: uniqid(), name: value };
-                categoriesArray.push(categoryObject);
-                const updatedCategoriesArrayString = JSON.stringify(categoriesArray);
-                localStorage.setItem("categories", updatedCategoriesArrayString);
-                e.currentTarget.reset();
-            }
+            apiCall.then(res => {
+                const { status } = res || {};
+                if ((params?.id?.[0] && status === 200) || (!params?.id?.[0] && status === 201)) {
+                    setIsLoading(false);
+                    router.push("/categoryListing");
+                }
+            }).catch(error => {
+                setIsLoading(false);
+                setErrorMessage(error.message);
+            });
         }
-    };
+    }
 
     return (
         <form onSubmit={handleSubmit} className="container mx-auto mt-8 category-container">
@@ -73,13 +68,20 @@ const Category = () => {
                 maxLength={50}
                 placeHolder="Category Name"
                 name="category"
-                defaultValue={data.name || ""}
+                defaultValue={category.name || ""}
+                required
             />
             <Button
-                text={`${data.id ? "Update" : "Send"}`}
-                customClassName={`btn-category ${data.id ? "bg-color-green" : "bg-color-open-red"}`}
+                text={`${category._id ? "Update" : "Send"}`}
+                customClassName={`btn-category ${category._id ? "bg-color-green" : "bg-color-open-red"}`}
                 type="submit"
+                loading={isLoading}
             />
+            {errorMessage && (
+                <div className="flex justify-center mt-4">
+                    <p className="text-red-500">{errorMessage}</p>
+                </div>
+            )}
         </form>
     )
 }

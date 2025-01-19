@@ -7,7 +7,7 @@ interface IBrand extends Document {
     updatedAt: Date;
 }
 
-const userSchema = new mongoose.Schema(
+const brandSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-const Brand = mongoose.models.Brand || mongoose.model<IBrand>('Brand', userSchema);
+const Brand = mongoose.models.Brand || mongoose.model<IBrand>('Brand', brandSchema);
 
 export default Brand;
 
