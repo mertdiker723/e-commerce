@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import "./Styles.scss";
 
 type BaseType = {
-    id: number | string;
+    _id: number | string;
     name: string;
 };
 
@@ -17,7 +17,7 @@ type SelectTypes<T extends BaseType> = {
 
 const Select = <T extends BaseType>({ data, label, name, defaultValue }: SelectTypes<T>) => {
     const [renderKey, setRenderKey] = useState(0);
-    const currentValue = defaultValue?.id || -1;
+    const currentValue = defaultValue?._id || -1;
 
     useEffect(() => {
         setRenderKey(prevKey => prevKey + 1);
@@ -29,7 +29,7 @@ const Select = <T extends BaseType>({ data, label, name, defaultValue }: SelectT
             <select key={renderKey} className="input-field" defaultValue={currentValue} name={name}>
                 <option value={-1} disabled>Choose a {label}</option>
                 {data && data.map(item => (
-                    <option key={item.id} value={item.id}>{item.name}</option>
+                    <option key={item._id} value={item._id}>{item.name}</option>
                 ))}
             </select>
         </label>

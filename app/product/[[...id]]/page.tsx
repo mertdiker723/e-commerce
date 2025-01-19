@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
-import uniqid from 'uniqid';
+import axios from "axios";
 
 // Components
 import Button from "@/common/Button";
@@ -23,6 +23,7 @@ type ProductStateType = {
     categories: CategoryType[];
     selects: any[];
     data: ProductType;
+    errorMessage: string;
 }
 
 const Product = ({ params }: { params: { id: string[] } }) => {
@@ -30,27 +31,27 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         brands: [],
         categories: [],
         selects: [],
-        data: {} as ProductType
+        data: {} as ProductType,
+        errorMessage: ''
     });
-    const { brands, categories, selects, data } = state;
+    const { brands, categories, selects, data, errorMessage } = state;
 
     const router = useRouter();
 
     useEffect(() => {
         const id = params?.id?.[0];
         if (!id) return;
-        if (localStorage.getItem("products")) {
 
-            const productsArray: ProductType[] = JSON.parse(localStorage.getItem("products") || "[]");
-
-            const findedProduct = productsArray.find(item => item.id === id);
-            if (findedProduct) {
-                setState({
-                    data: findedProduct
-                });
-            }
-        } localStorage.getItem("products")
-
+        axios.get(`/api/product?id=${id}`).then(res => {
+            const { data } = res || {}
+            setState({
+                data
+            })
+        }).catch(error => {
+            setState({
+                errorMessage: error.message
+            });
+        })
 
     }, [params?.id]);
 
@@ -62,34 +63,29 @@ const Product = ({ params }: { params: { id: string[] } }) => {
     ];
 
     useEffect(() => {
-        const categoriesFromLocalStorage = JSON.parse(localStorage.getItem("categories") || '[]') as CategoryType[];
-        const brandsFromLocalStorage = JSON.parse(localStorage.getItem("brands") || '[]') as BrandType[];
+        const fetchCategories = axios.get("/api/category");
+        const fetchBrands = axios.get("/api/brand");
 
-        const categoryDefaultValue = categoriesFromLocalStorage.find(item => item?.id === data.category?.id);
-        const brandDefaultValue = brandsFromLocalStorage.find(item => item?.id === data.brand?.id);
-
-
-        setState({
-            selects: [
-                { label: "Category", data: categories, name: "category", defaultValue: categoryDefaultValue },
-                { label: "Brand", data: brands, name: "brand", defaultValue: brandDefaultValue }
-            ]
-        });
-
-    }, [data.category?.id, data.brand?.id, categories, brands]);
-
-    useEffect(() => {
-        const brandItems: BrandType[] = JSON.parse(localStorage.getItem("brands") || "[]");
-        const categoryItems: CategoryType[] = JSON.parse(localStorage.getItem("categories") || "[]");
-
-        setState({
-            brands: brandItems,
-            categories: categoryItems
-        });
-    }, []);
-
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        Promise.all([fetchCategories, fetchBrands])
+            .then(([categoriesRes, brandsRes]) => {
+                const selectedCategory = categoriesRes?.data?.find((category: CategoryType) => category?._id === data?.category?._id) || {};
+                const selectedBrand = brandsRes?.data?.find((brand: BrandType) => brand?._id === data?.brand?._id) || {};
+                setState({
+                    selects: [
+                        { label: "Category", data: categoriesRes?.data, name: "category", defaultValue: selectedCategory },
+                        { label: "Brand", data: brandsRes?.data, name: "brand", defaultValue: selectedBrand }
+                    ],
+                    categories: categoriesRes.data,
+                    brands: brandsRes.data
+                });
+            })
+            .catch(error => {
+                setState({
+                    errorMessage: error.message
+                });
+            });
+    }, [data?.brand?._id, data?.category?._id]);
+    const handleSubmitApi = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         let formData = new FormData(e.currentTarget);
         const productName = formData.get("productName") as string;
@@ -99,44 +95,31 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         const categoryId = formData.get("category") as string;
         const brandId = formData.get("brand") as string;
 
-        const category = categories.find(item => item.id === categoryId);
-        const brand = brands.find(item => item.id === brandId);
-
-        let productsArray: ProductType[] = JSON.parse(localStorage.getItem("products") || "[]");
-        if (productName.trim()) {
-            if (data.id) {
-                const updatedProductsArray = productsArray.map(product => {
-                    if (product.id === data.id) {
-                        return { ...product, productName, productDetail, date, price, brand, category };
-                    }
-                    return product;
+        if (productName.trim() && price.trim()) {
+            axios.post("/api/product", {
+                productName,
+                productDetail,
+                price: +price,
+                date,
+                brand: brands.find(brand => brand._id === brandId),
+                category: categories.find(category => category._id === categoryId)
+            }).then(res => {
+                const { status } = res || {};
+                if (status === 201) {
+                    router.push("/productListing");
+                }
+            })
+                .catch(error => {
+                    setState({
+                        errorMessage: error.message
+                    });
                 });
-
-                const updatedProductsArrayString = JSON.stringify(updatedProductsArray);
-                localStorage.setItem("products", updatedProductsArrayString);
-
-                router.push("/productListing");
-            } else {
-                const productObject = {
-                    id: uniqid(),
-                    productName,
-                    productDetail,
-                    price: +price,
-                    date,
-                    category: category ?? null,
-                    brand: brand ?? null
-                };
-                productsArray.push(productObject);
-                const updatedProductsArrayString = JSON.stringify(productsArray);
-                localStorage.setItem("products", updatedProductsArrayString);
-                e.currentTarget.reset();
-            }
         }
-    };
+    }
 
 
     return (
-        <form onSubmit={handleSubmit} className="container mx-auto mt-8 product-container">
+        <form onSubmit={handleSubmitApi} className="container mx-auto mt-8 product-container">
             {inputs.map((input, index) => (
                 <Input key={index} {...input} />
             ))}
@@ -144,10 +127,15 @@ const Product = ({ params }: { params: { id: string[] } }) => {
                 <Select key={index} {...select} />
             ))}
             <Button
-                text={`${data.id ? "Update" : "Send"}`}
-                customClassName={`btn-product ${data.id ? "bg-color-green" : "bg-color-open-red"}`}
+                text={`${data._id ? "Update" : "Send"}`}
+                customClassName={`btn-product ${data._id ? "bg-color-green" : "bg-color-open-red"}`}
                 type="submit"
             />
+            {errorMessage && (
+                <div className="flex justify-center mt-4">
+                    <p className="text-red-500">{errorMessage}</p>
+                </div>
+            )}
         </form>
     )
 }

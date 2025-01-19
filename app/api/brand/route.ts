@@ -64,6 +64,9 @@ export const DELETE = async (request: NextRequest) => {
     await dbConnect();
     const { id } = await request.json();
     try {
+        if (!id) {
+            return NextResponse.json({ message: 'Brand id is required' }, { status: 400 });
+        }
         const deletedBrand = await Brand.findByIdAndDelete(id);
         return NextResponse.json({ message: 'Brand deleted successfully', brand: deletedBrand }, { status: 200 });
     } catch (error) {

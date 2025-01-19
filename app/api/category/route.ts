@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import dbConnect from "@/lib/mongodb";
-
 import Category from "@/models/api/category";
-
 
 export const GET = async (request: NextRequest) => {
     await dbConnect();
@@ -61,6 +59,9 @@ export const DELETE = async (request: NextRequest) => {
     const id = searchParams.get('id');
 
     try {
+        if (!id) {
+            return NextResponse.json({ message: 'Category id is required' }, { status: 400 });
+        }
         const category = await Category.findByIdAndDelete(id);
         if (!category) {
             return NextResponse.json({ message: 'Category not found' }, { status: 404 });

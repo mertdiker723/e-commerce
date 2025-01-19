@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
+import axios from 'axios';
 
 // Models
 import ProductType from '@/models/product';
@@ -11,22 +12,28 @@ import Button from '@/common/Button';
 
 
 const ProductListing = () => {
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
 
-  const [data, setData] = useState<ProductType[]>([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
 
   useEffect(() => {
-    let productArray: ProductType[] = JSON.parse(localStorage.getItem("products") || "[]");
-    setData(productArray);
+    axios.get("/api/product").then(res => {
+      const { data } = res || {};
+      setProducts(data);
+    }).catch(error => {
+      setProducts(error.message);
+    })
   }, [])
 
-
   const deleteProduct = (id: string) => {
-    const productsArray = data.filter(item => item.id !== id);
-
-    localStorage.setItem("products", JSON.stringify(productsArray));
-
-    setData(productsArray)
+    axios.delete(`/api/product?id=${id}`).then(res => {
+      const { data } = res || {};
+      const newData = products?.filter((item: ProductType) => item._id !== data.product._id);
+      setProducts(newData);
+    }).catch(error => {
+      setErrorMessage(error.message);
+    })
   }
 
   return (
@@ -46,11 +53,11 @@ const ProductListing = () => {
         </thead>
         <tbody>
           {
-            data.map((item) => {
-              const { id, productName, productDetail, date, price, brand, category } = item || {};
+            products?.map((item) => {
+              const { _id, productName, productDetail, date, price, brand, category } = item || {};
               return (
-                <tr key={id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                  <td className="px-6 py-4">{id}</td>
+                <tr key={_id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                  <td className="px-6 py-4">{_id}</td>
                   <td className="px-6 py-4">{productName || '-'}</td>
                   <td className="px-6 py-4">{productDetail || '-'}</td>
                   <td className="px-6 py-4">{date || '-'}</td>
@@ -58,8 +65,8 @@ const ProductListing = () => {
                   <td className="px-6 py-4">{category?.name || '-'}</td>
                   <td className="px-6 py-4">{brand?.name || '-'}</td>
                   <td className="px-6 py-4 flex justify-end">
-                    <Button type="button" text="Delete" onClick={() => deleteProduct(id)} customClassName="bg-color-open-red width-fix mr-3" />
-                    <Button type="button" text="Edit" onClick={() => router.push(`/product/${id}`)} customClassName="bg-color-green width-fix" />
+                    <Button type="button" text="Delete" onClick={() => deleteProduct(_id)} customClassName="bg-color-open-red width-fix mr-3" />
+                    <Button type="button" text="Edit" onClick={() => router.push(`/product/${_id}`)} customClassName="bg-color-green width-fix" />
                   </td>
                 </tr>
               )
@@ -67,6 +74,11 @@ const ProductListing = () => {
           }
         </tbody>
       </table>
+      {errorMessage && (
+        <div className="flex justify-center mt-4">
+          <p className="text-red-500">{errorMessage}</p>
+        </div>
+      )}
     </div>
   )
 }

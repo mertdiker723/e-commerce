@@ -2,7 +2,7 @@ import BrandType from "../brand";
 import CategoryType from "../category";
 
 type ProductType = {
-    id: string;
+    _id: string;
     productName: string;
     productDetail: string;
     date: string;
