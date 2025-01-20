@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
@@ -15,12 +14,11 @@ import BrandType from '@/models/brand';
 // Styles
 import "./Styles.scss"
 
-const Brand = () => {
+const Brand = ({ params }: { params: { id: string[] } }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [data, setData] = useState<BrandType>({} as BrandType);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const params = useParams() as { id: string[] };
   const router = useRouter();
 
   useEffect(() => {

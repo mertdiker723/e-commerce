@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 
 // Components
@@ -11,13 +12,13 @@ import BrandType from "@/models/brand";
 
 // Styles
 import "./Style.scss";
-import axios from "axios";
 
 const BrandListing = () => {
-    const router = useRouter()
+    const router = useRouter();
 
     const [brands, setBrands] = useState<BrandType[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         axios.get("/api/brand").then((res) => {
@@ -30,15 +31,18 @@ const BrandListing = () => {
     }, [])
 
     const deleteBrand = (id: string) => {
+        setIsLoading(true)
         axios.delete("/api/brand", { data: { id } }).then((res) => {
             const { data } = res || {};
             const { brand } = data || [];
 
             const filteredData = brands.filter((item) => item._id !== brand._id);
             setBrands(filteredData);
+            setIsLoading(false)
 
         }).catch((error) => {
             setErrorMessage(error.message);
+
         });
     }
     return (
@@ -60,7 +64,7 @@ const BrandListing = () => {
                                     <td className="px-6 py-4">{_id}</td>
                                     <td className="px-6 py-4">{name}</td>
                                     <td className="px-6 py-4 flex justify-end">
-                                        <Button type="button" text="Delete" onClick={() => deleteBrand(_id)} customClassName="bg-color-open-red width-fix mr-3" />
+                                        <Button type="button" text="Delete" onClick={() => deleteBrand(_id)} customClassName="bg-color-open-red width-fix mr-3" loading={isLoading} />
                                         <Button type="button" text="Edit" onClick={() => router.push(`/brand/${_id}`)} customClassName="bg-color-green width-fix" />
                                     </td>
                                 </tr>

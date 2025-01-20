@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
@@ -15,12 +14,11 @@ import CategoryType from '@/models/category';
 // Styles
 import "./Styles.scss"
 
-const Category = () => {
+const Category = ({ params }: { params: { id: string[] } }) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [category, setCategory] = useState<CategoryType>({} as CategoryType);
     const [errorMessage, setErrorMessage] = useState<string>("");
 
-    const params = useParams() as { id: string[] };
     const router = useRouter();
 
     useEffect(() => {

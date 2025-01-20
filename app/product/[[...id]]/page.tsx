@@ -34,7 +34,7 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         errorMessage: '',
         isloading: false
     });
-    const { brands, categories, selects, data, errorMessage } = state;
+    const { brands, categories, selects, data, errorMessage, isloading } = state;
     const router = useRouter();
 
     useEffect(() => {
@@ -87,6 +87,9 @@ const Product = ({ params }: { params: { id: string[] } }) => {
     }, [data?.brand?._id, data?.category?._id]);
     const handleSubmitApi = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setState({
+            isloading: true
+        })
         const id = params?.id?.[0];
         const formData = new FormData(e.currentTarget);
         const productName = formData.get("productName") as string;
@@ -112,11 +115,13 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         apiCall.then(res => {
             const { status } = res || {};
             if ((id && status === 200) || (!id && status === 201)) {
-
+                setState({
+                    isloading: true
+                })
                 router.push("/productListing");
             }
         }).catch(error => {
-            setState({ errorMessage: error.message });
+            setState({ errorMessage: error.message, isloading: false });
         })
     }
 
@@ -133,6 +138,7 @@ const Product = ({ params }: { params: { id: string[] } }) => {
                 text={`${data._id ? "Update" : "Send"}`}
                 customClassName={`btn-product ${data._id ? "bg-color-green" : "bg-color-open-red"}`}
                 type="submit"
+                loading={isloading}
             />
             {errorMessage && (
                 <div className="flex justify-center mt-4">

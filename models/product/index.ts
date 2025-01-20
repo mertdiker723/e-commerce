@@ -9,6 +9,8 @@ type ProductType = {
     price: number;
     category: CategoryType | null;
     brand: BrandType | null;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 
