@@ -49,7 +49,7 @@ const Category = () => {
 
             apiCall.then(res => {
                 const { status } = res || {};
-                if ((params?.id?.[0] && status === 200) || (!params?.id?.[0] && status === 201)) {
+                if ((id && status === 200) || (!id && status === 201)) {
                     setIsLoading(false);
                     router.push("/categoryListing");
                 }

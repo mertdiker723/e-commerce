@@ -9,7 +9,6 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     try {
-
         if (id) {
             const brand = await Brand.findById(id);
             if (!brand) {

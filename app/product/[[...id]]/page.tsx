@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -17,13 +16,13 @@ import CategoryType from "@/models/category";
 // Styles
 import "./Styles.scss";
 
-
 type ProductStateType = {
     brands: BrandType[];
     categories: CategoryType[];
     selects: any[];
     data: ProductType;
     errorMessage: string;
+    isloading: boolean;
 }
 
 const Product = ({ params }: { params: { id: string[] } }) => {
@@ -32,10 +31,10 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         categories: [],
         selects: [],
         data: {} as ProductType,
-        errorMessage: ''
+        errorMessage: '',
+        isloading: false
     });
     const { brands, categories, selects, data, errorMessage } = state;
-
     const router = useRouter();
 
     useEffect(() => {
@@ -55,11 +54,12 @@ const Product = ({ params }: { params: { id: string[] } }) => {
 
     }, [params?.id]);
 
+    // Input Fields
     const inputs = [
-        { label: "Product Name:", type: "text", name: "productName", maxLength: 30, placeHolder: "Product Name", defaultValue: data.productName },
-        { label: "Product Detail:", type: "text", name: "productDetail", maxLength: 50, placeHolder: "Product Detail", defaultValue: data.productDetail },
-        { label: "Price:", type: "number", name: "price", maxLength: 10, placeHolder: "Price", defaultValue: (data.price || "").toString() },
-        { label: "Date:", type: "date", name: "date", defaultValue: data.date }
+        { label: "Product Name:", type: "text", name: "productName", maxLength: 30, placeHolder: "Product Name", defaultValue: data.productName, required: true },
+        { label: "Product Detail:", type: "text", name: "productDetail", maxLength: 50, placeHolder: "Product Detail", defaultValue: data.productDetail, required: false },
+        { label: "Price:", type: "number", name: "price", maxLength: 10, placeHolder: "Price", defaultValue: (data.price || "").toString(), required: true },
+        { label: "Date:", type: "date", name: "date", defaultValue: data.date, required: false }
     ];
 
     useEffect(() => {
@@ -85,9 +85,10 @@ const Product = ({ params }: { params: { id: string[] } }) => {
                 });
             });
     }, [data?.brand?._id, data?.category?._id]);
-    const handleSubmitApi = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitApi = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let formData = new FormData(e.currentTarget);
+        const id = params?.id?.[0];
+        const formData = new FormData(e.currentTarget);
         const productName = formData.get("productName") as string;
         const productDetail = formData.get("productDetail") as string;
         const price = formData.get("price") as string;
@@ -95,26 +96,28 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         const categoryId = formData.get("category") as string;
         const brandId = formData.get("brand") as string;
 
-        if (productName.trim() && price.trim()) {
-            axios.post("/api/product", {
-                productName,
-                productDetail,
-                price: +price,
-                date,
-                brand: brands.find(brand => brand._id === brandId),
-                category: categories.find(category => category._id === categoryId)
-            }).then(res => {
-                const { status } = res || {};
-                if (status === 201) {
-                    router.push("/productListing");
-                }
-            })
-                .catch(error => {
-                    setState({
-                        errorMessage: error.message
-                    });
-                });
-        }
+        if (!productName.trim() || !price.trim()) return;
+
+        const payload = {
+            productName,
+            productDetail,
+            price: +price,
+            date,
+            brand: brands.find(brand => brand._id === brandId),
+            category: categories.find(category => category._id === categoryId)
+        };
+        const apiCall = id
+            ? axios.put(`/api/product?id=${id}`, payload)
+            : axios.post("/api/product", payload);
+        apiCall.then(res => {
+            const { status } = res || {};
+            if ((id && status === 200) || (!id && status === 201)) {
+
+                router.push("/productListing");
+            }
+        }).catch(error => {
+            setState({ errorMessage: error.message });
+        })
     }
 
 

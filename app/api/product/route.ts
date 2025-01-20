@@ -11,11 +11,11 @@ export const GET = async (req: NextRequest) => {
 
     try {
         if (id) {
-            const product = await Product.findById(id);
+            const product = await Product.findById(id).populate('brand').populate('category');;
             if (!product) {
                 return NextResponse.json({ message: 'Product not found' }, { status: 404 });
             }
-            return NextResponse.json({ ...product }, { status: 200 });
+            return NextResponse.json(product, { status: 200 });
         }
         const products = await Product.find().populate('brand').populate('category');
 
@@ -39,6 +39,27 @@ export const POST = async (req: NextRequest) => {
     }
 }
 
+export const PUT = async (req: NextRequest) => {
+    await dbConnect();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    const { productName, productDetail, date, price, category, brand } = await req.json();
+
+    if (!id) {
+        return NextResponse.json({ message: 'Product id is required' }, { status: 400 });
+    }
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(id, { productName, productDetail, date, price, category, brand });
+
+        if (!updatedProduct) {
+            return NextResponse.json({ message: 'Product not found' }, { status: 404 });
+        }
+        return NextResponse.json({ message: 'Product updated successfully', updatedProduct }, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Error happened ' }, { status: 500 });
+    }
+}
+
 export const DELETE = async (req: NextRequest) => {
     await dbConnect();
     const { searchParams } = new URL(req.url);
@@ -46,7 +67,7 @@ export const DELETE = async (req: NextRequest) => {
 
     try {
         if (!id) {
-            return NextResponse.json({ message: 'Product id is required' }, { status: 400 });            
+            return NextResponse.json({ message: 'Product id is required' }, { status: 400 });
         }
         const product = await Product.findByIdAndDelete(id);
         if (!product) {
