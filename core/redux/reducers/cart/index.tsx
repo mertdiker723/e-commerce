@@ -4,63 +4,35 @@ const initialState = {
     cart: [] as CartType[]
 };
 
-type CartType = {
-    product: ProductType;
-    count: number;
+type CartType = ProductType & {
+    itemCount: number;
 };
 
-const cartReducer = (state = initialState, action: { type: string; payload?: CartType }) => {
+const cartReducer = (state = initialState, action: { type: string; payload?: CartType | CartType[] }) => {
     switch (action.type) {
+        case 'CART_GET_ALL': {
+            return {
+                ...state,
+                cart: action?.payload || []
+            }
+        }
         case 'CART_ONE_ADD': {
-            const existingProductIndex = state.cart.findIndex(
-                (item) => item.product.id === action?.payload?.product.id
-            );
-
-            if (existingProductIndex !== -1) {
-                const updatedCart = state.cart.map((item, index) =>
-                    index === existingProductIndex
-                        ? { ...item, count: item.count + 1 }
-                        : item
+            const findedItem = state.cart.find(item => item._id === (action.payload as CartType)?._id);
+            if (findedItem) {
+                const updatedCart = state.cart.map((item) =>
+                    item._id === findedItem?._id ? { ...item, ...action.payload } : item
                 );
-
                 return {
                     ...state,
                     cart: updatedCart
                 };
-            }
-            return {
-                ...state,
-                cart: [...state.cart, { product: action?.payload?.product, count: 1 }]
-            };
-        }
-        case 'CART_ONE_REMOVE': { 
-            return { 
-                ...state, 
-                cart: state.cart.filter((item) => item.product.id !== action?.payload?.product.id)
-            }
-        }  
-        case 'CART_DESCREASE_COUNT': {
-            const existingProductIndex = state.cart.findIndex(
-                (item) => item.product.id === action?.payload?.product.id
-            );
-
-            if (existingProductIndex !== -1) {
-                const updatedCart = state.cart.map((item, index) =>
-                    index === existingProductIndex
-                        ? { ...item, count: item.count - 1 }
-                        : item
-                );
-
-                const filteredCart = updatedCart.filter((item) => item.count > 0);
-
+            } else {
                 return {
                     ...state,
-                    cart: filteredCart
+                    cart: [...state.cart, action.payload]
                 };
             }
-            return state;
         }
-    
         default:
             return state;
     }

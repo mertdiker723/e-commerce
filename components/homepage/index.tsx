@@ -10,11 +10,13 @@ import axios from "axios";
 
 const Homepage = () => {
     const [products, setProducts] = useState<ProductType[]>([]);
-
+    const [errorMessage, setErrorMessage] = useState<string>("");
     useEffect(() => {
         axios.get("/api/product").then((res) => {
             const { data } = res || {}
             setProducts(data);
+        }).catch((error) => {
+            setErrorMessage(error.message);
         })
     }, [])
 
@@ -23,10 +25,15 @@ const Homepage = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {
                     products && products.map((item) => {
-                        return <CardItem key={item._id} {...item} />
+                        return <CardItem key={item._id} setErrorMessage={setErrorMessage} {...item} />
                     })
                 }
             </div>
+            {errorMessage && (
+                <div className="flex justify-center mt-4">
+                    <p className="text-red-500">{errorMessage}</p>
+                </div>
+            )}
         </div>
     )
 }

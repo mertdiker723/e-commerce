@@ -1,7 +1,7 @@
 "use client"
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from 'next/navigation'
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 
 // Next
@@ -14,17 +14,32 @@ import DropdownLink from "../DropdownLink";
 import ProductType from "@/models/product";
 // Styles
 import "./Style.scss";
+import axios from "axios";
 
 type RootState = {
     cartReducer: {
-        cart: (ProductType & { count: number })[];
+        cart: (ProductType & { itemCount: number })[];
     };
 };
 const Navbar = () => {
     const navRef = useRef<HTMLElement>(null);
+    const dispatch = useDispatch();
     const params = usePathname();
     const { cart } = useSelector((state: RootState) => state.cartReducer);
-    const totalItems = cart.reduce((total, item) => total + item.count, 0);
+    const [totalItems, setTotalItems] = useState<number>(0);
+
+    useEffect(() => {
+        setTotalItems(cart.reduce((total, item) => total + item.itemCount, 0));
+    }, [cart])
+    useEffect(() => {
+        axios.get("/api/cart").then((res) => {
+            const data = res?.data as { product: ProductType, itemCount: number }[];
+            dispatch({
+                type: 'CART_GET_ALL', payload: data.map(({ product, itemCount }) => ({ ...product, itemCount }))
+
+            });
+        })
+    }, [dispatch])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -101,7 +116,8 @@ const Navbar = () => {
                                     height={20}
                                     alt="picture"
                                 />
-                                ({totalItems > 0 ? <span>{totalItems}</span> : 0})</div>
+                                ({totalItems > 0 ? <span>{totalItems}</span> : 0})
+                            </div>
                         </Link>
                     </div>
                     <div className="link"><Link href="/login">Login</Link></div>

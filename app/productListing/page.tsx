@@ -12,17 +12,17 @@ import Button from '@/common/Button';
 
 
 const ProductListing = () => {
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const router = useRouter();
-
+  
   const [products, setProducts] = useState<ProductType[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     axios.get("/api/product").then(res => {
       const { data } = res || {};
       setProducts(data);
     }).catch(error => {
-      setProducts(error.message);
+      setErrorMessage(error.message);
     })
   }, [])
 
@@ -53,7 +53,7 @@ const ProductListing = () => {
         </thead>
         <tbody>
           {
-            products?.map((item) => {
+            products && products.map((item) => {
               const { _id, productName, productDetail, date, price, brand, category } = item || {};
               return (
                 <tr key={_id} className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">

@@ -1,21 +1,51 @@
+import axios from "axios";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import Image from "next/image";
 
 // Models
 import ProductType from "@/models/product";
 
+// Common
+import Button from "@/common/Button";
+
 // Assets && Images
 import "./Style.scss";
 
-const CardItem = ({ _id, brand, category, date, price, productDetail, productName }: ProductType) => {
+interface CardItemProps extends ProductType {
+    setErrorMessage: (message: string) => void;
+}
+
+const CardItem = (props: CardItemProps) => {
+    const { _id, brand, category, date, price, productDetail, productName, setErrorMessage } = props;
     const dispatch = useDispatch();
-    const addToCart = () => {
-        dispatch({
-            type: 'CART_ONE_ADD', payload: {
-                product: { _id, brand, category, date, price, productDetail, productName },
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const handleSubmit = (product: ProductType) => {
+        setIsLoading(true);
+        axios.post("/api/cart", {
+            product,
+        }).then((res) => {
+            const { data, status } = res || {}
+            if (status === 201) {
+                const { cart } = data || {};
+                const { product, itemCount } = cart || {};
+
+                dispatch({
+                    type: 'CART_ONE_ADD', payload: {
+                        ...product, itemCount,
+                    }
+                });
+
             }
-        });
-    };
+
+
+            setIsLoading(false);
+        }).catch((error) => {
+            setErrorMessage(error.message);
+            setIsLoading(false);
+        })
+    }
     return (
         <div className="cart-container">
             <Image
@@ -41,9 +71,13 @@ const CardItem = ({ _id, brand, category, date, price, productDetail, productNam
                 Description: {productDetail}
             </div>
             <div className="grid gap-2 mt-2">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={addToCart}>
-                    Sepete Ekle
-                </button>
+                <Button
+                    onClick={() => handleSubmit({ _id, brand, category, date, price, productDetail, productName })}
+                    type="button"
+                    customClassName="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    text="Sepete Ekle"
+                    loading={isLoading}
+                />
             </div>
 
         </div>

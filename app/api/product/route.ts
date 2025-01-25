@@ -11,13 +11,14 @@ export const GET = async (req: NextRequest) => {
 
     try {
         if (id) {
-            const product = await Product.findById(id).populate('brand').populate('category');;
+            const product = await Product.findById(id).populate({ path: 'brand', select: "name" }).populate({ path: 'category', select: "name" });
             if (!product) {
                 return NextResponse.json({ message: 'Product not found' }, { status: 404 });
             }
             return NextResponse.json(product, { status: 200 });
         }
-        const products = await Product.find().populate('brand').populate('category');
+        const products = await Product.find().populate({ path: 'brand' }).populate({ path: 'category' });
+
 
         return NextResponse.json(products, { status: 200 });
 

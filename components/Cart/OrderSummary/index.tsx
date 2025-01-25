@@ -1,20 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 
 import ProductType from '@/models/product';
 
 type RootState = {
     cartReducer: {
-        cart: { product: ProductType, count: number }[];
+        cart: (ProductType & { itemCount: number })[];
     };
 };
 
 const OrderSummary = () => {
+    const [totalPrice, setTotalPrice] = useState<number>(0);
     const { cart } = useSelector((state: RootState) => state.cartReducer);
 
-    const totalPrice = cart.reduce((acc, item) => {
-        return acc + item.product.price * item.count
-    }, 0);
+    useEffect(() => {
+        if (cart.length > 0) {
+            setTotalPrice(cart?.reduce((total, item) => total + item.price, 0));
+        }
+    }, [cart])
 
     return (
         <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
