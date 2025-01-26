@@ -7,8 +7,8 @@ interface IProduct extends Document {
     price: number;
     category: mongoose.Schema.Types.ObjectId;
     brand: mongoose.Schema.Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 const productSchema = new mongoose.Schema(

@@ -17,13 +17,14 @@ export const GET = async (req: NextRequest) => {
             }
             return NextResponse.json(product, { status: 200 });
         }
-        const products = await Product.find().populate({ path: 'brand' }).populate({ path: 'category' });
+
+        const products = await Product.find().populate({ path: 'category' }).populate({ path: 'brand' });
 
 
         return NextResponse.json(products, { status: 200 });
 
     } catch (error) {
-        return NextResponse.json({ message: 'Error happened ' }, { status: 500 });
+        return NextResponse.json({ message: error }, { status: 500 });
     }
 };
 

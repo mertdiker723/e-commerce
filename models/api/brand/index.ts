@@ -1,25 +1,12 @@
-import mongoose from "mongoose";
-
+import mongoose, { Schema, Document } from 'mongoose';
 
 interface IBrand extends Document {
     name: string;
-    createdAt: Date;
-    updatedAt: Date;
 }
 
-const brandSchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: true
-        }
-    },
-    {
-        timestamps: true
-    }
-);
+const BrandSchema: Schema = new Schema({
+    name: { type: String, required: true }
+});
 
-const Brand = mongoose.models.Brand || mongoose.model<IBrand>('Brand', brandSchema);
-
+const Brand = mongoose.models.Brand || mongoose.model<IBrand>('Brand', BrandSchema);
 export default Brand;
-
