@@ -16,7 +16,7 @@ const cartReducer = (state = initialState, action: { type: string; payload?: Car
                 cart: action?.payload || []
             }
         }
-        case 'CART_ONE_ADD': {
+        case 'CART_UPDATE_COUNT': {
             const findedItem = state.cart.find(item => item._id === (action.payload as CartType)?._id);
             if (findedItem) {
                 const updatedCart = state.cart.map((item) =>
@@ -31,6 +31,12 @@ const cartReducer = (state = initialState, action: { type: string; payload?: Car
                     ...state,
                     cart: [...state.cart, action.payload]
                 };
+            }
+        }
+        case 'CART_REMOVE_ITEM': {
+            return {
+                ...state,
+                cart: state.cart.filter(item => item._id !== (action.payload as CartType)?._id)
             }
         }
         default:

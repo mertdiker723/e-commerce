@@ -32,14 +32,12 @@ const CardItem = (props: CardItemProps) => {
                 const { product, itemCount } = cart || {};
 
                 dispatch({
-                    type: 'CART_ONE_ADD', payload: {
+                    type: 'CART_UPDATE_COUNT', payload: {
                         ...product, itemCount,
                     }
                 });
 
             }
-
-
             setIsLoading(false);
         }).catch((error) => {
             setErrorMessage(error.message);

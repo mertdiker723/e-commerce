@@ -46,3 +46,45 @@ export const POST = async (request: NextRequest) => {
         return NextResponse.json({ message: 'Error happened' }, { status: 500 });
     }
 }
+
+
+export const PUT = async (request: NextRequest) => {
+    await dbConnect();
+    const { product, riseCounting } = await request.json();
+    try {
+        let cart = await Cart.findOne({ product });
+        if (!cart) {
+            return NextResponse.json({ message: 'Cart not found' }, { status: 404 });
+        }
+       cart.itemCount += riseCounting ? 1 : -1;
+
+       if (cart.itemCount === 0) {
+           await cart.deleteOne();
+           cart = await cart.populate('product');
+           return NextResponse.json({ message: 'Cart deleted successfully', cart }, { status: 200 });
+       }
+
+       await cart.save();
+       cart = await cart.populate('product');
+       return NextResponse.json({ message: 'Cart updated successfully', cart }, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Error happened' }, { status: 500 });
+    }
+}
+
+
+export const DELETE = async (request: NextRequest) => {
+    await dbConnect();
+    const { product } = await request.json();
+    try {
+        let cart = await Cart.findOne({ product });
+        if (!cart) {
+            return NextResponse.json({ message: 'Cart item is not found!' }, { status: 400 });
+        }
+        await cart.deleteOne();
+        cart = await cart.populate('product');
+        return NextResponse.json({ message: 'Cart deleted successfully', cart }, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ message: 'Error happened' }, { status: 500 });
+    }
+}

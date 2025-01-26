@@ -31,6 +31,7 @@ const Navbar = () => {
     useEffect(() => {
         setTotalItems(cart.reduce((total, item) => total + item.itemCount, 0));
     }, [cart])
+
     useEffect(() => {
         axios.get("/api/cart").then((res) => {
             const data = res?.data as { product: ProductType, itemCount: number }[];
