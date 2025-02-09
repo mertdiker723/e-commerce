@@ -13,6 +13,9 @@ import ProductType from "@/models/product";
 import BrandType from "@/models/brand";
 import CategoryType from "@/models/category";
 
+// Core
+import { formatDate } from "@/core/helper";
+
 // Styles
 import "./Styles.scss";
 
@@ -53,13 +56,13 @@ const Product = ({ params }: { params: { id: string[] } }) => {
         })
 
     }, [params?.id]);
-
+    
     // Input Fields
     const inputs = [
         { label: "Product Name:", type: "text", name: "productName", maxLength: 30, placeHolder: "Product Name", defaultValue: data.productName, required: true },
         { label: "Product Detail:", type: "text", name: "productDetail", maxLength: 50, placeHolder: "Product Detail", defaultValue: data.productDetail, required: false },
         { label: "Price:", type: "number", name: "price", maxLength: 10, placeHolder: "Price", defaultValue: (data.price || "").toString(), required: true },
-        { label: "Date:", type: "date", name: "date", defaultValue: data.date, required: false }
+        { label: "Date:", type: "date", name: "date", defaultValue: data.date ? formatDate(data.date, true) : '', required: false }
     ];
 
     useEffect(() => {

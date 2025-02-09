@@ -11,14 +11,25 @@ import axios from "axios";
 const Homepage = () => {
     const [products, setProducts] = useState<ProductType[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     useEffect(() => {
         axios.get("/api/product").then((res) => {
             const { data } = res || {}
             setProducts(data);
         }).catch((error) => {
             setErrorMessage(error.message);
+        }).finally(() => {
+            setIsLoading(false);
         })
-    }, [])
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p>Loading...</p>
+            </div>
+        )
+    }
 
     return (
         <div className="p-5">

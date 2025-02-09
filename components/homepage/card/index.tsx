@@ -11,6 +11,7 @@ import Button from "@/common/Button";
 
 // Assets && Images
 import "./Style.scss";
+import { formatDate } from "@/core/helper";
 
 interface CardItemProps extends ProductType {
     setErrorMessage: (message: string) => void;
@@ -38,9 +39,9 @@ const CardItem = (props: CardItemProps) => {
                 });
 
             }
-            setIsLoading(false);
         }).catch((error) => {
             setErrorMessage(error.message);
+        }).finally(() => {
             setIsLoading(false);
         })
     }
@@ -54,11 +55,7 @@ const CardItem = (props: CardItemProps) => {
                 alt="Picture of the author"
             />
             <div className="grid gap-2 mt-2"><b>Brand: {brand?.name} - Category: {category?.name}</b></div>
-            <div className="grid gap-2">Date: {new Date(date).toLocaleDateString('tr-TR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            })}</div>
+            <div className="grid gap-2">Date: {formatDate(date)}</div>
             <div className="grid gap-2 mt-1">
                 <div className="flex justify-between items-center w-full">
                     <div>Product Name: {productName}</div>

@@ -9,11 +9,12 @@ import ProductType from '@/models/product';
 
 // Components
 import Button from '@/common/Button';
+import { formatDate } from '@/core/helper';
 
 
 const ProductListing = () => {
   const router = useRouter();
-  
+
   const [products, setProducts] = useState<ProductType[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -60,7 +61,7 @@ const ProductListing = () => {
                   <td className="px-6 py-4">{_id}</td>
                   <td className="px-6 py-4">{productName || '-'}</td>
                   <td className="px-6 py-4">{productDetail || '-'}</td>
-                  <td className="px-6 py-4">{date || '-'}</td>
+                  <td className="px-6 py-4">{date ? formatDate(date) : '-'}</td>
                   <td className="px-6 py-4">{price || '-'}</td>
                   <td className="px-6 py-4">{category?.name || '-'}</td>
                   <td className="px-6 py-4">{brand?.name || '-'}</td>

@@ -1,30 +1,33 @@
 "use client"
 
+import React from 'react'
+
 import { useRouter } from 'next/navigation'
 
 // Common
-import Button from '@/common/Button'
 import Input from '@/common/Input'
+import Button from '@/common/Button'
 
+// Styles
 import "./Style.scss"
 
-const LoginFrame = () => {
+
+const RegisterFrame = () => {
     const route = useRouter();
     return (
-        <div className='login-frame-container'>
+        <div className='register-frame-container'>
             <button type="button" onClick={() => route.back()} className='back-button'>
                 Go Back
             </button>
             <div className='text-center'>Logo</div>
+            <Input label="Name" />
+            <Input label="Surname" />
             <Input label='Email Adress' />
             <Input label='Password' type='password' />
-            <Button text='Login' type='button' customClassName='bg-color-open-red mt-4' />
-            <div className='flex justify-between mt-4'>
-                <button onClick={() => route.push("/register")} >Sign up</button>
-                <span>Forgot Password?</span>
-            </div>
+            <Input label='Repassword' type='password' />
+            <Button text='Register' type='button' customClassName='bg-color-open-red mt-4' />            
         </div>
     )
 }
 
-export default LoginFrame
+export default RegisterFrame

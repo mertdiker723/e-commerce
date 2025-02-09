@@ -13,7 +13,7 @@ const OrderSummary = () => {
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const { cart } = useSelector((state: RootState) => state.cartReducer);
     useEffect(() => {
-        if (cart.length > 0) {
+        if (cart.length >= 0) {
             setTotalPrice(cart?.reduce((total, item) => total + (item.price * item.itemCount), 0));
         }
     }, [cart])

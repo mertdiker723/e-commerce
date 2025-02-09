@@ -1,0 +1,15 @@
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  .input-field {
+    flex: 1;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+}

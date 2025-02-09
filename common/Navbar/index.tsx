@@ -31,8 +31,14 @@ const Navbar = () => {
     useEffect(() => {
         setTotalItems(cart.reduce((total, item) => total + item.itemCount, 0));
     }, [cart])
+    const isHiddenRoute = (params: string | undefined): boolean => {
+        const hiddenRoutes = ["login", "register", "forgot-password"];
+        const firstParam = params?.split("/")[1];
+        return firstParam ? hiddenRoutes.includes(firstParam) : false;
+    };
 
     useEffect(() => {
+        if (isHiddenRoute(params)) return;
         axios.get("/api/cart").then((res) => {
             const data = res?.data as { product: ProductType, itemCount: number }[];
             dispatch({
@@ -40,7 +46,7 @@ const Navbar = () => {
 
             });
         })
-    }, [dispatch])
+    }, [dispatch, params])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -74,9 +80,7 @@ const Navbar = () => {
         { href: "/product", text: "Product", className: "" },
         { href: "/productListing", text: "Product List", className: "mt-2" }
     ];
-
-    if (params && params.split("/").length > 0 && params.split("/")[1] === 'login') return;
-
+    if (isHiddenRoute(params)) return;
     return (
         <nav ref={navRef} className="navbar-container">
             <div>
