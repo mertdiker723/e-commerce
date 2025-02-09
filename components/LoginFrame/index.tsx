@@ -21,7 +21,6 @@ const LoginFrame = () => {
             <Button text='Login' type='button' customClassName='bg-color-open-red mt-4' />
             <div className='flex justify-between mt-4'>
                 <button onClick={() => route.push("/register")} >Sign up</button>
-                <span>Forgot Password?</span>
             </div>
         </div>
     )

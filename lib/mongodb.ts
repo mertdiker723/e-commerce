@@ -1,7 +1,4 @@
 import mongoose from 'mongoose';
-import "@/models/api/brand";
-import "@/models/api/category";
-import "@/models/api/product";
 
 const MONGO_URL = process.env.MONGODB_URI;
 

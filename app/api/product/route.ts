@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Product from "@/models/api/product";
 
+// models
+import "@/models/api/brand";
+import "@/models/api/category";
+
 
 export const GET = async (req: NextRequest) => {
     await dbConnect();
