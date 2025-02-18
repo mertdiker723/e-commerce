@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from 'next/navigation'
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'
 
 // Next
 import Image from "next/image";
@@ -23,10 +24,13 @@ type RootState = {
 };
 const Navbar = () => {
     const navRef = useRef<HTMLElement>(null);
+    const route = useRouter();
     const dispatch = useDispatch();
     const params = usePathname();
     const { cart } = useSelector((state: RootState) => state.cartReducer);
     const [totalItems, setTotalItems] = useState<number>(0);
+    const [userItemId, setItemId] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         setTotalItems(cart.reduce((total, item) => total + item.itemCount, 0));
@@ -36,6 +40,25 @@ const Navbar = () => {
         const firstParam = params?.split("/")[1];
         return firstParam ? hiddenRoutes.includes(firstParam) : false;
     };
+    useEffect(() => {
+        if (isHiddenRoute(params)) return;
+        axios.get("/api/users").then((res) => {
+            setItemId(res?.data?.user?.userId)
+        }).catch((err) => { }).finally(() => {
+            setLoading(false)
+        })
+    }, [params])
+
+    const handleLogout = () => {
+        axios.get('/api/users/logout').then((res) => {
+            if (res.status === 200) {
+                route.push("/login");
+            }
+        }).catch((err) => {
+            // eslint-disable-next-line no-console
+            console.log(err.response.data);
+        })
+    }
 
     useEffect(() => {
         if (isHiddenRoute(params)) return;
@@ -80,6 +103,12 @@ const Navbar = () => {
         { href: "/product", text: "Product", className: "" },
         { href: "/productListing", text: "Product List", className: "mt-2" }
     ];
+
+    const loginLogoutButton = () => {
+        if (loading) return <button>Loading...</button>
+        if (userItemId) return <button onClick={handleLogout}>Logout</button>
+        return <Link href="/login">Login</Link>
+    }
     if (isHiddenRoute(params)) return;
     return (
         <nav ref={navRef} className="navbar-container">
@@ -125,7 +154,9 @@ const Navbar = () => {
                             </div>
                         </Link>
                     </div>
-                    <div className="link"><Link href="/login">Login</Link></div>
+                    <div className="link">
+                        {loginLogoutButton()}
+                    </div>
                 </div>
             </div>
             <div className="contents-mobile">

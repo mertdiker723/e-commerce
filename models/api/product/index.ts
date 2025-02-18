@@ -5,6 +5,7 @@ interface IProduct extends Document {
     productDetail: string;
     date: Date;
     price: number;
+    userId: string,
     category: mongoose.Schema.Types.ObjectId;
     brand: mongoose.Schema.Types.ObjectId;
     createdAt?: Date;
@@ -26,6 +27,10 @@ const productSchema = new mongoose.Schema(
         price: {
             type: Number,
             required: true
+        },
+        userId: {
+            type: String,
+            required: [true, "User ID is required"]
         },
         category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
         brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' }

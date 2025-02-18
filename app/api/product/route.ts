@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import jwt from 'jsonwebtoken';
 
 import dbConnect from "@/lib/mongodb";
 import Product from "@/models/api/product";
@@ -13,16 +14,35 @@ export const GET = async (req: NextRequest) => {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
+    let token = null;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    }
+
+    let decodedToken = null;
+    if (token) {
+        try {
+            decodedToken = jwt.verify(token, process.env.NEXT_PUBLIC_JWT_SECRET as string) as { userId: string };
+        } catch (error) {
+            return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+        }
+    }
+
+    if (!decodedToken?.userId) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         if (id) {
-            const product = await Product.findById(id).populate({ path: 'brand', select: "name" }).populate({ path: 'category', select: "name" });
+            const product = await Product.findOne({ _id: id, userId: decodedToken.userId }).populate({ path: 'brand', select: "name" }).populate({ path: 'category', select: "name" });
             if (!product) {
                 return NextResponse.json({ message: 'Product not found' }, { status: 404 });
             }
             return NextResponse.json(product, { status: 200 });
         }
 
-        const products = await Product.find().populate({ path: 'category' }).populate({ path: 'brand' });
+        const products = await Product.find({ userId: decodedToken.userId }).populate({ path: 'category' }).populate({ path: 'brand' });
 
 
         return NextResponse.json(products, { status: 200 });
@@ -35,9 +55,24 @@ export const GET = async (req: NextRequest) => {
 export const POST = async (req: NextRequest) => {
     await dbConnect();
     const { productName, productDetail, date, price, category, brand } = await req.json();
+    let token = null;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    }
+    let decodedToken = null;
+    if (token) {
+        try {
+            decodedToken = jwt.verify(token, process.env.NEXT_PUBLIC_JWT_SECRET as string) as { userId: string; email: string; password: string; iat: number; exp: number };
+        } catch (error) {
+            return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+        }
+    }
+
+    let tId = decodedToken?.userId;
 
     try {
-        const product = await Product.create({ productName, productDetail, date, price, category, brand });
+        const product = await Product.create({ productName, productDetail, date, price, userId: tId, category, brand });
         return NextResponse.json({ message: 'Product created successfully', product }, { status: 201 })
 
     } catch (error) {

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Cart from "@/models/api/cart";
 
-
+import "@/models/api/product";
 
 export const GET = async (request: NextRequest) => {
     await dbConnect();

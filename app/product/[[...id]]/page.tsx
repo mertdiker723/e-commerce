@@ -110,7 +110,7 @@ const Product = ({ params }: { params: { id: string[] } }) => {
             price: +price,
             date,
             brand: brands.find(brand => brand._id === brandId),
-            category: categories.find(category => category._id === categoryId)
+            category: categories.find(category => category._id === categoryId),
         };
         const apiCall = id
             ? axios.put(`/api/product?id=${id}`, payload)
